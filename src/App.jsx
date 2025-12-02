@@ -1,67 +1,80 @@
-import { useState } from 'react'
-import Header from './components/Header'
-import Dictionary from './components/Dictionary'
-
+import { useState } from "react";
+import Header from "./components/Header";
+import Dictionary from "./components/Dictionary";
 
 export default function App() {
-  const [dark, setDark] = useState(false)
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [theme, setTheme] = useState("light");
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
 
-  const fetchWord = async (word) => {
-    setLoading(true)
-    setError(null)
-    setData(null)
-    
-    try {
-      const response = await fetch(
-        `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-      )
-      
-      if (!response.ok) {
-        throw new Error('Word not found')
-      }
-      
-      const result = await response.json()
-      setData(result[0])
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
+  const toggleTheme = () => {
+    setTheme((p) => (p === "light" ? "dark" : "light"));
+  };
+
+  const searchWord = async (query) => {
+    if (!query.trim()) {
+      setMsg("Please enter a word.");
+      setResult(null);
+      return;
     }
-  }
+
+    setLoading(true);
+    setMsg("");
+    setResult(null);
+
+    try {
+      const res = await fetch(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${query}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Word not found");
+      }
+
+      const json = await res.json();
+      setResult(json[0]);
+    } catch (error) {
+      setMsg(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className={`min-h-screen transition-colors ${
-      dark ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
-    }`}>
+    <div
+      className={`min-h-screen transition-all duration-300 ${
+        theme === "dark" ? "bg-[#0d0d0d] text-white" : "bg-[#f7f7f7] text-black"
+      }`}
+    >
+      {/* HEADER */}
       <Header
-        onSearch={fetchWord}
-        dark={dark}
-        setDark={setDark}
+        onSearch={searchWord}
+        dark={theme === "dark"}
+        setDark={toggleTheme}
       />
-      
-      {loading && (
-        <div className='container mx-auto px-5 text-center py-10'>
-          <p className={dark ? 'text-gray-400' : 'text-gray-600'}>
-            Loading...
-          </p>
-        </div>
-      )}
-      
-      {error && (
-        <div className='container mx-auto px-5 text-center py-10'>
-          <p className='text-red-500'>{error}</p>
-          <p className={`mt-2 ${dark ? 'text-gray-400' : 'text-gray-600'}`}>
-            Please try searching for another word
-          </p>
-        </div>
-      )}
-      
-      {!loading && !error && data && (
-        <Dictionary data={data} dark={dark} />
-      )}
+
+      {/* CONTENT */}
+      <div className="container mx-auto px-5 py-6">
+        {loading && (
+          <div className="text-center animate-pulse py-10">
+            <p className="opacity-70 text-lg">Searching...</p>
+          </div>
+        )}
+
+        {msg && !loading && (
+          <div className="text-center py-10">
+            <p className="text-red-500 font-semibold">{msg}</p>
+            <p className="opacity-60 mt-1">Try another word.</p>
+          </div>
+        )}
+
+        {!loading && !msg && result && (
+          <div className="animate-fade-in">
+            <Dictionary data={result} dark={theme === "dark"} />
+          </div>
+        )}
+      </div>
     </div>
-  )
+  );
 }

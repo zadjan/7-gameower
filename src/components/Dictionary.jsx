@@ -1,97 +1,108 @@
-import { Volume2 } from 'lucide-react'
+import { Volume2 } from "lucide-react";
 
-function Dictionary({ data, dark }) {
+export default function Dictionary({ data, dark }) {
+  if (!data) return null;
+
   const playAudio = () => {
-    if (data?.phonetics) {
-      const audioUrl = data.phonetics.find(p => p.audio)?.audio
-      if (audioUrl) {
-        new Audio(audioUrl).play()
-      }
-    }
-  }
-
-  if (!data) return null
+    const audioFile = data.phonetics?.find((p) => p.audio)?.audio;
+    if (audioFile) new Audio(audioFile).play();
+  };
 
   return (
-    <div className='container mx-auto px-5 pb-10'>
-      <div className='flex justify-between items-center mb-8'>
+    <section className="container mx-auto px-5 pb-10">
+      {/* WORD HEADER */}
+      <div className="flex justify-between items-center mb-10">
         <div>
-          <h1 className='text-6xl font-bold mb-2'>{data.word}</h1>
-          <p className='text-purple-600 text-xl'>{data.phonetic}</p>
+          <h1 className="text-5xl font-extrabold">{data.word}</h1>
+          <p className="text-purple-500 text-xl mt-2">{data.phonetic}</p>
         </div>
-        {data.phonetics?.some(p => p.audio) && (
-          <button 
+
+        {data.phonetics?.some((p) => p.audio) && (
+          <button
             onClick={playAudio}
-            className='w-16 h-16 rounded-full bg-purple-200 flex items-center justify-center hover:bg-purple-300 transition-colors'
+            className="w-16 h-16 rounded-full flex items-center justify-center bg-purple-200 hover:bg-purple-300 transition"
           >
-            <img src="./images/icon-play.svg" alt="" />
+            <Volume2 size={30} className="text-purple-700" />
           </button>
         )}
       </div>
-      {data.meanings?.map((meaning, idx) => (
-        <div key={idx} className='mb-8'>
-          <div className='flex items-center gap-4 mb-6'>
-            <h2 className='text-2xl font-bold italic'>{meaning.partOfSpeech}</h2>
-            <div className={`flex-1 h-px ${dark ? 'bg-gray-700' : 'bg-gray-300'}`} />
+
+      {/* MEANINGS */}
+      {data.meanings?.map((m, i) => (
+        <div key={i} className="mb-10">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-2xl font-semibold italic">{m.partOfSpeech}</h2>
+            <div
+              className={`flex-1 h-px ${dark ? "bg-gray-700" : "bg-gray-300"}`}
+            />
           </div>
-          <h3 className={`text-lg mb-4 ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
-            Meaning
+
+          <h3
+            className={`mb-3 text-lg ${
+              dark ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
+            Meaning:
           </h3>
-          <ul className='mb-6 space-y-3'>
-            {meaning.definitions?.map((def, defIdx) => (
-              <li key={defIdx} className='flex gap-4'>
-                <span className='text-purple-600 mt-1'>•</span>
+
+          <ul className="space-y-4">
+            {m.definitions?.map((def, dIndex) => (
+              <li key={dIndex} className="flex gap-3">
+                <span className="text-purple-500 text-xl">•</span>
                 <div>
-                  <p className={dark ? 'text-white' : 'text-gray-900'}>
-                    {def.definition}
-                  </p>
+                  <p className="font-medium">{def.definition}</p>
+
                   {def.example && (
-                    <p className={`mt-2 ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
-                      "{def.example}"
+                    <p
+                      className={`mt-1 italic ${
+                        dark ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
+                      “{def.example}”
                     </p>
                   )}
                 </div>
               </li>
             ))}
           </ul>
-          {meaning.synonyms?.length > 0 && (
-            <div className='flex gap-6 flex-wrap items-start'>
-              <span className={`text-lg ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
-                Synonyms
+
+          {m.synonyms?.length > 0 && (
+            <div className="mt-6 flex gap-3 items-center flex-wrap">
+              <span
+                className={`font-medium ${
+                  dark ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                Synonyms:
               </span>
-              <div className='flex gap-3 flex-wrap'>
-                {meaning.synonyms.slice(0, 5).map((syn, synIdx) => (
-                  <span key={synIdx} className='text-purple-600 font-bold'>
-                    {syn}
-                  </span>
-                ))}
-              </div>
+              {m.synonyms.slice(0, 6).map((syn, sIndex) => (
+                <span key={sIndex} className="text-purple-600 font-bold">
+                  {syn}
+                </span>
+              ))}
             </div>
           )}
         </div>
       ))}
+
+      {/* SOURCE */}
       {data.sourceUrls?.length > 0 && (
-        <div className={`pt-6 mt-6 border-t ${dark ? 'border-gray-700' : 'border-gray-300'}`}>
-          <div className='flex gap-4 items-center flex-wrap'>
-            <span className={`text-sm underline ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
-              Source
-            </span>
-            <a 
-              href={data.sourceUrls[0]} 
-              target='_blank' 
-              rel='noopener noreferrer'
-              className={`text-sm underline flex items-center gap-2 ${dark ? 'text-gray-300' : 'text-gray-700'}`}
-            >
-              {data.sourceUrls[0]}
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M10 1H6M10 1V5M10 1L5 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </a>
-          </div>
+        <div
+          className={`border-t pt-6 ${
+            dark ? "border-gray-700" : "border-gray-300"
+          }`}
+        >
+          <p className="text-sm opacity-70 mb-1">Source</p>
+          <a
+            href={data.sourceUrls[0]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-sm flex items-center gap-2"
+          >
+            {data.sourceUrls[0]}
+          </a>
         </div>
       )}
-    </div>
-  )
+    </section>
+  );
 }
-
-export default Dictionary

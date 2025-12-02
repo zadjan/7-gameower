@@ -1,84 +1,82 @@
-import { Moon, Search } from 'lucide-react'
-import { useState } from 'react'
+import { useState } from "react";
+import { Search, Moon } from "lucide-react";
+import logo from "../../images/logo.png";
 
 export default function Header({ onSearch, dark, setDark }) {
-  const [font, setFont] = useState('sans-serif')
-  const [searchTerm, setSearchTerm] = useState('')
+  const [query, setQuery] = useState("");
+  const [font, setFont] = useState("Inter");
 
-  const handleSearch = () => {
-    if (searchTerm.trim()) {
-      onSearch(searchTerm)
-    }
-  }
+  const submitSearch = () => {
+    if (query.trim()) onSearch(query);
+  };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch()
-    }
-  }
+  const onEnter = (e) => {
+    if (e.key === "Enter") submitSearch();
+  };
 
   return (
-    <div className='container mx-auto p-5'>
-      <div className='flex justify-between items-center mb-8'>
-        <img 
-          src='./images/logo.png' 
-          alt='Dictionary' 
-          className='w-8 h-8' 
+    <header className="py-6 container mx-auto px-5">
+      <div className="flex justify-between items-center mb-8">
+        <img
+          src={logo}
+          alt="ZADJAN Logo"
+          className="w-14 h-14 object-contain"
         />
-        <div className='flex items-center gap-4'>
+
+        <div className="flex items-center gap-5">
           <select
             value={font}
             onChange={(e) => setFont(e.target.value)}
-            className={`px-4 py-2 rounded border-none font-bold cursor-pointer ${
-              dark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
+            className={`px-3 py-2 rounded-lg cursor-pointer shadow ${
+              dark ? "bg-gray-800 text-white" : "bg-white text-gray-700"
             }`}
-            style={{ fontFamily: font }}
           >
-            <option value='sans-serif'>Sans Serif</option>
-            <option value='serif'>Serif</option>
-            <option value='monospace'>Mono</option>
+            <option value="Inter">Sans Serif</option>
+            <option value="Serif">Serif</option>
+            <option value="Mono">Mono</option>
           </select>
 
-          <div className="flex items-center gap-3">
-            <div className={`h-6 w-px ${dark ? 'bg-gray-700' : 'bg-gray-300'}`} />
-            <button
-              onClick={() => setDark(!dark)}
-              className={`relative w-10 h-5 rounded-full transition-colors ${
-                dark ? 'bg-purple-600' : 'bg-gray-300'
+          <button
+            onClick={() => setDark(!dark)}
+            className={`w-12 h-6 rounded-full relative transition ${
+              dark ? "bg-purple-600" : "bg-gray-300"
+            }`}
+          >
+            <div
+              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                dark ? "translate-x-6" : ""
               }`}
-            >
-              <div
-                className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                  dark ? 'translate-x-5' : ''
-                }`}
-              />
-            </button>
-            <Moon size={20} className={dark ? 'text-purple-600' : 'text-gray-400'} />
-          </div>
+            />
+          </button>
+
+          <Moon
+            size={20}
+            className={dark ? "text-purple-500" : "text-gray-500"}
+          />
         </div>
       </div>
 
       <div className="relative">
         <input
-          type='text'
-          placeholder='Search for any word...'
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className={`w-full px-6 py-4 rounded-xl text-lg font-bold outline-none ${
+          type="text"
+          placeholder="Search for a word..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={onEnter}
+          className={`w-full px-5 py-4 rounded-xl text-lg font-medium outline-none shadow ${
             dark
-              ? 'bg-gray-800 text-white placeholder-gray-500'
-              : 'bg-gray-100 text-gray-900 placeholder-gray-400'
+              ? "bg-[#1a1a1a] text-white placeholder-gray-500"
+              : "bg-gray-100 text-gray-900 placeholder-gray-500"
           }`}
           style={{ fontFamily: font }}
         />
-        <button onClick={handleSearch}>
-          <Search
-            size={20}
-            className="absolute right-6 top-1/2 -translate-y-1/2 text-purple-600 cursor-pointer hover:text-purple-700"
-          />
-        </button>
+
+        <Search
+          onClick={submitSearch}
+          size={22}
+          className="absolute right-5 top-1/2 -translate-y-1/2 cursor-pointer text-purple-600 hover:text-purple-700"
+        />
       </div>
-    </div>
-  )
+    </header>
+  );
 }
